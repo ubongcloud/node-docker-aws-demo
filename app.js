@@ -11,7 +11,7 @@ app.use((req, res, next) => {
 
 // Define a basic route
 app.get('/', (req, res) => {
-  res.send('Hello, World! This is your first containerized app on AWS!');
+  res.send('Hello, World! This is your first containerized app on AWS! And i have also added my first CI Pipeline');
 });
 
 // Start the server
