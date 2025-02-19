@@ -1,0 +1,42 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '14'
+
+    - name: Install Dependencies
+      run: npm install
+
+    - name: Run Tests
+      run: npm test
+
+    - name: Build Docker Image
+      run: docker build -t node-docker-aws-demo .
+
+    - name: Run Container Tests
+      run: |
+        docker run -d --name test_container -p 3000:3000 node-docker-aws-demo
+        echo "Waiting for the container to start..."
+        sleep 10
+        if ! curl --fail http://localhost:3000; then
+          echo "Container test failed!"
+          docker logs test_container
+          docker stop test_container
+          exit 1
+        fi
+        docker stop test_container
